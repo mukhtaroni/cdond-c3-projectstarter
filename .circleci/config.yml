@@ -37,7 +37,7 @@ build-backend:
           key: backend-build
 
 workflows:
-  serverconfig:
+  default:
     jobs:
       - build-frontend
       - build-backend          
