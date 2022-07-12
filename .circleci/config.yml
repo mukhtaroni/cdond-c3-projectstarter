@@ -11,13 +11,14 @@ jobs:
       - run:
           name: Build front-end
           command: |
-            sudo npm install webpack-dev-server -g
             cd frontend
-            sudo npm i
-            sudo npm run build
+            npm install
+            npm update
+            npm run build 
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
+          
 
 build-backend:
     docker:
@@ -30,7 +31,7 @@ build-backend:
           name: Back-end build
           command: |
               cd backend
-              npm i
+              npm install
               npm run build
       - save_cache:
           paths: [backend/node_modules]
