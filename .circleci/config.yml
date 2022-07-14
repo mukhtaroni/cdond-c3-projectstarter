@@ -35,7 +35,6 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
-      - failure
 
   build-backend:
     docker:
@@ -55,7 +54,6 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
-      - failure
 
   test-frontend:
     docker:
@@ -77,7 +75,6 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
-      - failure
 
   test-backend:
     docker:
@@ -99,7 +96,6 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
-      - failure
 
   scan-frontend:
     docker:
@@ -122,7 +118,6 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
-      - failure
 
   scan-backend:
     docker:
@@ -143,7 +138,7 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
-      - failure
+
 
 workflows:
   default:
