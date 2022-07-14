@@ -35,6 +35,7 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
+      - failure
 
   build-backend:
     docker:
@@ -54,6 +55,7 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
+      - failure
 
   test-frontend:
     docker:
@@ -72,6 +74,10 @@ jobs:
             cd frontend
             npm install
             npm run test          
+      - save_cache:
+          paths: [frontend/node_modules]
+          key: frontend-build
+      - failure
 
   test-backend:
     docker:
@@ -90,6 +96,10 @@ jobs:
             cd backend
             npm install
             npm run test 
+      - save_cache:
+          paths: [backend/node_modules]
+          key: backend-build
+      - failure
 
   scan-frontend:
     docker:
@@ -108,7 +118,12 @@ jobs:
               cd frontend
               npm install
               npm audit fix --audit-level=critical --force
-            #npm audit --audit-level=critical --force         
+            #npm audit --audit-level=critical --force
+      - save_cache:
+          paths: [frontend/node_modules]
+          key: frontend-build
+      - failure
+
   scan-backend:
     docker:
       # Docker image here
@@ -125,7 +140,10 @@ jobs:
           command: |
               cd backend
               npm audit fix --audit-level=critical
-
+      - save_cache:
+          paths: [backend/node_modules]
+          key: backend-build
+      - failure
 
 workflows:
   default:
