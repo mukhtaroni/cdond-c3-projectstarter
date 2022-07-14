@@ -1,8 +1,7 @@
 version: 2.1
 
 orbs:
-  slack: circleci/slack@4.9.3
-jobs:
+  slack: circleci/slack@4.10.1
   notify:
     docker:
       - image: circleci/node:13.8.0
@@ -16,7 +15,7 @@ jobs:
           template: success_tagged_deploy_1
       
 
-
+jobs:
   build-frontend:
     docker:
       - image: circleci/node:13.8.0
