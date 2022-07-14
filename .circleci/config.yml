@@ -143,6 +143,5 @@ workflows:
           requires: [build-frontend]
 
   send-notification:
-    jobs:
       - notify:
           context: slack-secrets      
