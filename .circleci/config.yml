@@ -1,7 +1,8 @@
 version: 2.1
 
 orbs:
-  slack: circleci/slack@4.10.1
+  slack: circleci/slack@4.9.3
+jobs:
   notify:
     docker:
       - image: circleci/node:13.8.0
@@ -15,7 +16,7 @@ orbs:
           template: success_tagged_deploy_1
       
 
-jobs:
+
   build-frontend:
     docker:
       - image: circleci/node:13.8.0
@@ -143,5 +144,6 @@ workflows:
           requires: [build-frontend]
 
   send-notification:
+    jobs:
       - notify:
           context: slack-secrets      
