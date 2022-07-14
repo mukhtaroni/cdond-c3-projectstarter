@@ -2,21 +2,24 @@ version: 2.1
 
 orbs:
   slack: circleci/slack@4.10.1
-jobs:
-  notify:
-    docker:
-      - image: circleci/node:13.8.0
+  #jobs:
+commands:
+  #notify:
+  failure:
+    #docker:
+     # - image: circleci/node:13.8.0
     steps:
       - run: echo "Sending status"
       - slack/notify:
+          channel: Cloud_DevOps
           event: fail
           template: basic_fail_1
-      - slack/notify:
-          event: pass
-          template: success_tagged_deploy_1
+      #- slack/notify:
+       #   event: pass
+        #  template: success_tagged_deploy_1
       
 
-
+jobs:
   build-frontend:
     docker:
       - image: circleci/node:13.8.0
@@ -35,7 +38,7 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
-
+      - failure
   build-backend:
     docker:
       - image: circleci/node:13.8.0
@@ -54,7 +57,7 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
-
+      - failure
   test-frontend:
     docker:
       # Docker image here
@@ -75,7 +78,7 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
-
+      - failure
   test-backend:
     docker:
       # Docker image here
@@ -96,7 +99,7 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
-
+      - failure
   scan-frontend:
     docker:
       # Docker image here
@@ -118,7 +121,7 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
-
+      - failure
   scan-backend:
     docker:
       # Docker image here
@@ -138,7 +141,20 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
+      - failure
 
+  success:
+    docker:
+      - image:  'circleci/base:stable'
+    steps:
+      - slack/notify:
+          channel:  Cloud_DevOps
+          event:  pass
+          template: success_tagged_deploy_1
+      - slack/notify:
+          channel:  Cloud_DevOps
+          event:  pass
+          template: basic_success_1
 
 workflows:
   default:
@@ -156,7 +172,12 @@ workflows:
       - scan-frontend:
           requires: [build-frontend]
 
-  send-notification:
-    jobs:
-      - notify:
-          context: slack-secrets      
+      - success:
+          context: slack-secrets
+          requires:
+            - scan-backend
+
+  #send-notification:
+   # jobs:
+    #  - notify:
+     #     context: slack-secrets      
