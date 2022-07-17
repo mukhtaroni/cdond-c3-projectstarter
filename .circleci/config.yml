@@ -1,21 +1,5 @@
 version: 2.1
 
-orbs:
-  slack: circleci/slack@4.10.1
-jobs:
-  notify:
-    docker:
-      - image: 'cimg/base:stable'
-    steps:
-      - checkout
-      - slack/notify:
-          channel: C03DAJYL3SM
-          event: fail
-          template: basic_fail_1
-      #- slack/notify:
-       #   event: pass
-        #  template: success_tagged_deploy_1
-
 
 commands:
   destroy-environment:
@@ -36,8 +20,22 @@ commands:
             aws s3 rm s3://udapeople-project3-<<parameters.workflow_id>> --recursive
             aws cloudformation delete-stack --stack-name udapeople-frontend-serv-<<parameters.workflow_id>>
 
-      
+orbs:
+  slack: circleci/slack@4.10.1
 jobs:
+  notify:
+    docker:
+      - image: 'cimg/base:stable'
+    steps:
+      - checkout
+      - slack/notify:
+          channel: C03DAJYL3SM
+          event: fail
+          template: basic_fail_1
+      #- slack/notify:
+       #   event: pass
+        #  template: success_tagged_deploy_1
+
   build-frontend:
     docker:
       - image: circleci/node:13.8.0
