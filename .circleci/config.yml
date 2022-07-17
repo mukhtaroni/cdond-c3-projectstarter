@@ -23,7 +23,6 @@ commands:
 orbs:
   slack: circleci/slack@4.10.1
   #jobs:
-commands:
   #notify:
   failure:
     #docker:
