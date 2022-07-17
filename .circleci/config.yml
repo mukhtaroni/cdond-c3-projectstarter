@@ -1,5 +1,22 @@
 version: 2.1
 
+orbs:
+  slack: circleci/slack@4.10.1
+jobs:
+  notify:
+    docker:
+      - image: 'cimg/base:stable'
+    steps:
+      - checkout
+      - slack/notify:
+          channel: C03DAJYL3SM
+          event: fail
+          template: basic_fail_1
+      #- slack/notify:
+       #   event: pass
+        #  template: success_tagged_deploy_1
+
+
 commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
@@ -19,24 +36,7 @@ commands:
             aws s3 rm s3://udapeople-project3-<<parameters.workflow_id>> --recursive
             aws cloudformation delete-stack --stack-name udapeople-frontend-serv-<<parameters.workflow_id>>
 
-orbs:
-  slack: circleci/slack@4.10.1
-  #jobs:
-  #notify:
-  #failure:
-    #docker:
-     # - image: circleci/node:13.8.0
-    steps:
-      - run: echo "Sending status"
-      - slack/notify:
-          channel: Cloud_DevOps
-          event: fail
-          template: basic_fail_1
-      #- slack/notify:
-       #   event: pass
-        #  template: success_tagged_deploy_1
       
-
 jobs:
   build-frontend:
     docker:
@@ -161,19 +161,6 @@ jobs:
           key: backend-build
       #- failure
 
-  success:
-    docker:
-      - image:  'cimg/base:stable'
-    steps:
-      - slack/notify:
-          channel:  Cloud_DevOps
-          event:  pass
-          template: success_tagged_deploy_1
-      - slack/notify:
-          channel:  Cloud_DevOps
-          event:  pass
-          template: basic_success_1
-
   deploy-infrastructure:
     docker:
       - image: amazon/aws-cli
@@ -242,12 +229,10 @@ workflows:
           filters:
             branches:
               only: [test-feature-branch]
-
-      - success:
+      - notify:
           context: slack-secrets
           requires:
             - scan-backend
-
   #send-notification:
    # jobs:
     #  - notify:
