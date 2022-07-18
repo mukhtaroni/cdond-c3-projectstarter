@@ -133,7 +133,7 @@ jobs:
           working_directory: ./backend
           command: |
             npm install
-            npm audit --audit-level=critical
+            npm audit fix --audit-level=critical
 
   deploy-infrastructure:
     docker:
