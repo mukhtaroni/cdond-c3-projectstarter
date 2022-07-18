@@ -38,7 +38,21 @@ commands:
             npm run migrations:revert
             fi
 
+orbs: 
+  slack: circleci/slack@4.10.1
+
+
 jobs:
+  deploy:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - slack/notify:
+          channel: C03DAJYL3SM #channel
+          event: fail
+          template: basic_fail_1
+
   build-frontend:
     docker:
       - image: circleci/node:13.8.0
@@ -176,6 +190,13 @@ jobs:
       # Here's where you will add some code to rollback on failure
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+
+      - slack/notify:
+          channel: C03DAJYL3SM #channel
+          event: fail
+      - destroy_environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+        # when: on_fail
 
   configure-infrastructure:
     docker:
