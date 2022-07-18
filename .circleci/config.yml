@@ -167,44 +167,54 @@ jobs:
       # Checkout code from git
       - checkout
       - run:
+          name: Install tar utility
+          command: |
+            yum install -y tar gzip
+      - run:
           name: Ensure back-end infrastructure exists
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
               --stack-name udapeople-backend-serv-${CIRCLE_WORKFLOW_ID:0:7} \
-              --parameter-overrides ID="prodbuck-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --tags project=udapeople 
+              --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7} \
+              --tags project=udapeople-backend-serv-${CIRCLE_WORKFLOW_ID:0:7} 
           #exit 1
       - run:
           name: Ensure front-end infrastructure exist
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
-              --tags project=your-tag \
               --stack-name udapeople-frontend-serv-${CIRCLE_WORKFLOW_ID:0:7} \
-              --parameter-overrides ID="prodbuck-${CIRCLE_WORKFLOW_ID:0:7}" \  
-              --tags project=udapeople
+              --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7} \  
+              --tags project=udapeople-frontend-serv-${CIRCLE_WORKFLOW_ID:0:7}
           #exit 1
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            BACKEND_AWS_PUBLIC_IP=$(aws ec2 describe-instances \
-              --filters "Name=tag:Name,Values=backend-serv-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --output text)
-            echo "http://$BACKEND_AWS_PUBLIC_IP:3030" >> .circleci/outputs/backend_url.txt
-            echo "[all]" >> .circleci/ansible/inventory.txt
-            echo "$BACKEND_AWS_PUBLIC_IP" >> .circleci/ansible/inventory.txt
-            cat .circleci/outputs/backend_url.txt
-      - run: yum -y install tar gzip
+            aws ec2 describe-instances \
+            --query 'Reservations[*].Instances[*].PublicIpAddress' \
+            --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --output text >> ~/project/.circleci/ansible/inventory.txt
+            cat ~/project/.circleci/ansible/inventory.txt
+      - run:
+          name: save the new back-end url to memory using memstach
+          command: |
+            backend_url=$(aws ec2 describe-instances \
+            --query 'Reservations[*].Instances[*].PublicIpAddress' \
+            --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --output text)
+            curl -H "Content-Type: text/plain" \
+            -H "token: ecdfc255-81e1-4056-9efa-2d7fa10812e1" \
+            --request PUT \
+            --data "http://${backend_url}:3030" \
+            https://api.memstash.io/values/backend_url
       - persist_to_workspace:
           root: ~/
           paths:
-            - project/.circleci/outputs/backend_url.txt
             - project/.circleci/ansible/inventory.txt
       # Here's where you will add some code to rollback on failure
-      #- destroy_environment:
-          #workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
+      - destroy_environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
 
 workflows:
   default:
