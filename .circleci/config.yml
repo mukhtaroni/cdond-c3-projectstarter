@@ -68,7 +68,6 @@ jobs:
           name: Back-end build
           working_directory: ./backend
           command: |
-             cd frontend
              npm install
              npm run build
       - persist_to_workspace:
