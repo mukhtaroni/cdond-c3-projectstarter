@@ -43,13 +43,13 @@ orbs:
 
 
 jobs:
-  deploy:
+  notify:
     docker:
-      - image: circleci/node:13.8.0
+      - image: 'cimg/base:stable'
     steps:
       - checkout
       - slack/notify:
-          channel: C03DAJYL3SM #channel
+          channel: C03DAJYL3SM
           event: fail
           template: basic_fail_1
 
