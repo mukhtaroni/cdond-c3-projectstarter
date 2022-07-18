@@ -68,10 +68,9 @@ jobs:
           name: Back-end build
           working_directory: ./backend
           command: |
-            npm install
-            npm run build
-            cp .env dist/.env
-            pwd && ls -al
+             cd frontend
+             npm install
+             npm run build
       - persist_to_workspace:
           root: ~/
           paths:
