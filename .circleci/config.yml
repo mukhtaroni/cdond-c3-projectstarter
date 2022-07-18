@@ -68,7 +68,7 @@ jobs:
           name: Back-end build
           working_directory: ./backend
           command: |
-            npm i
+            npm install
             npm run build
             cp .env dist/.env
             pwd && ls -al
