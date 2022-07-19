@@ -26,16 +26,14 @@ commands:
     steps:
       - run:
           name: Revert migrations
-          # Add when this will run
           when: on_fail
           command: |
-            # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS=$(curl -H "token: ecdfc255-81e1-4056-9efa-2d7fa10812e1" \
-            --request GET https://api.memstash.io/values/DB_MIGRATION_<< parameters.workflow_id >>)
+            SUCCESS=$(curl --insecure https://kvdb.io/EV3nWbZyRWNxizvYe5UmdV/migration_<< parameters.workflow_id >>)
             if(( $SUCCESS==1 )); 
             then
-            cd backend
-            npm run migrations:revert
+              cd ~/project/backend
+              npm install
+              npm run migration:revert
             fi
 
 orbs: 
@@ -242,26 +240,21 @@ jobs:
       - image: sleavely/node-awscli:14.x
     steps:
       - checkout
+      - restore_cache:
+          keys: [backend-build]
       - run:
           name: Run migrations
           command: |
             cd backend
-            cat .env
-            npm i
+            npm install
             npm run build
-            npm run migrations
+            npm run migrations > migrations_dump.txt
       - run:
-          name: Send migration results to memstash
+          name: Send migration results to kvdb-backend
           command: |
-            echo "has been done successfully" > ./migration_status.txt
-            pwd && ls -al
-            if grep -q "has been done successfully" ./migration_status.txt 
-            then 
-              echo "has been done successfully"
-              curl -H "Content-Type: text/plain" -H "token: ecdfc255-81e1-4056-9efa-2d7fa10812e1" --request PUT --data "1" https://api.memstash.io/values/migrations-${CIRCLE_WORKFLOW_ID:0:7}
-            else
-              echo "has failed"
-              curl -H "Content-Type: text/plain" -H "token: ecdfc255-81e1-4056-9efa-2d7fa10812e1" --request PUT --data "0" https://api.memstash.io/values/migrations-${CIRCLE_WORKFLOW_ID:0:7}
+            if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+            then
+              curl --insecure https://kvdb.io/EV3nWbZyRWNxizvYe5UmdV/migration_$\{CIRCLE_WORKFLOW_ID:0:7\}  -d '1'
             fi
       # Here's where you will add some code to rollback on failure
       - destroy-environment:
