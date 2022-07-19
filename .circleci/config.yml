@@ -146,7 +146,7 @@ jobs:
           name: Back-end scan
           working_directory: ./backend
           command: |
-            npm install
+            npm install 
             npm audit fix --audit-level=critical
 
   deploy-infrastructure:
@@ -216,7 +216,7 @@ jobs:
       - checkout
       # Add ssh keys with fingerprint
       - add_ssh_keys:
-          fingerprints: ["45:44:e9:b4:35:84:f7:3f:e3:f9:5f:e5:a0:95:2a:b1"]
+          fingerprints: ["33:d2:fc:c6:53:8c:59:61:c2:75:f1:c0:41:c5:35:7c"]
       - attach_workspace:
           at: ~/
       - run:
