@@ -180,7 +180,16 @@ jobs:
             --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
             --output text >> ~/project/.circleci/ansible/inventory.txt
             cat ~/project/.circleci/ansible/inventory.txt
-
+        
+      - run:
+          name: save the new back-end url to memory using memstach
+          command: |
+            backend_url=$(aws ec2 describe-instances \
+            --query 'Reservations[*].Instances[*].PublicIpAddress' \
+            --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --output text)
+            curl https://kvdb.io/EV3nWbZyRWNxizvYe5UmdV/backend_url \
+            -d 'http://${backend_url}:3030'
       - persist_to_workspace:
           root: ~/
           paths:
@@ -270,10 +279,7 @@ jobs:
       - run:
           name: Get backend url
           command: |
-            API_URL=$(curl -H "Content-Type: text/plain" \
-            -H "token: ecdfc255-81e1-4056-9efa-2d7fa10812e1" \
-            --request GET \
-            https://api.memstash.io/values/backend_url)
+            API_URL=$(curl --insecure https://kvdb.io/EV3nWbZyRWNxizvYe5UmdV/backend_url)
             echo $API_URL
             echo "${API_URL}"
             echo "NODE_ENV=production" >> frontend/.env
@@ -283,7 +289,7 @@ jobs:
           name: Deploy frontend objects
           working_directory: ./frontend
           command: |
-            npm i
+            npm install
             npm run build
             ls -l
             aws s3 cp ./dist "s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --recursive
@@ -308,7 +314,7 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints: ["eb:8c:c3:a9:4b:36:3f:c7:69:df:e2:36:d3:22:f5:ed"]
+          fingerprints: ["33:d2:fc:c6:53:8c:59:61:c2:75:f1:c0:41:c5:35:7c"]
       - attach_workspace:
           at: /root
       - run:
