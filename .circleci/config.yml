@@ -379,12 +379,11 @@ jobs:
       - run:
           name: get old workflow for clean
           command: |
-            WorkflowID=$(aws cloudformation \
+            export OLD_WORKFLOW_ID-$(aws cloudformation \
             list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
             --no-paginate --output text)
-            curl --insecure https://kvdb.io/EV3nWbZyRWNxizvYe5UmdV/workflowid \
-            -d '$WorkflowID'
-            exit 1
+            echo "Old workflow ID: $OLD_WORKFLOW_ID"
+            curl  https://kvdb.io/EV3nWbZyRWNxizvYe5UmdV/old_workflow_id -d "${OLD_WORKFLOW_ID}"
       - run:
           name: Update cloudfront distribution
           command: |
@@ -418,7 +417,6 @@ jobs:
               aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
               aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
               aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
-            fi
             fi
 workflows:
   default:
