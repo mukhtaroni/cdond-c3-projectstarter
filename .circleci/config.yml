@@ -6,6 +6,7 @@ commands:
     parameters:
       # Add parameter here
       workflow_id:
+        default:  "${CIRCLE_WORKFLOW_ID:0:7}"
         type: string
     steps:
       - run:
@@ -13,22 +14,23 @@ commands:
           when: on_fail
           command: |
             # Your code here
-            aws cloudformation delete-stack --stack-name udapeople-backend-<<parameters.workflow_id>>
+            aws cloudformation delete-stack --stack-name "udapeople-backend-<<parameters.workflow_id>>"
             aws s3 rm s3://udapeople-<<parameters.workflow_id>> --recursive
-            aws cloudformation delete-stack --stack-name udapeople-frontend-<<parameters.workflow_id>>
+            aws cloudformation delete-stack --stack-name "udapeople-frontend-<<parameters.workflow_id>>"
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
       # Add parameter here
       workflow_id:
+        default:  "${CIRCLE_WORKFLOW_ID:0:7}"  
         type: string
     steps:
       - run:
           name: Revert migrations
           when: on_fail
           command: |
-            SUCCESS=$(curl --insecure https://kvdb.io/EV3nWbZyRWNxizvYe5UmdV/migration_<< parameters.workflow_id >>)
+            SUCCESS=$(curl --insecure "https://kvdb.io/EV3nWbZyRWNxizvYe5UmdV/migration_<< parameters.workflow_id >>")
             if(( $SUCCESS==1 )); 
             then
               cd ~/project/backend
@@ -382,6 +384,7 @@ jobs:
             --no-paginate --output text)
             curl --insecure https://kvdb.io/EV3nWbZyRWNxizvYe5UmdV/workflowid \
             -d '$WorkflowID'
+            exit 1
       - run:
           name: Update cloudfront distribution
           command: |
@@ -417,7 +420,6 @@ jobs:
               aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
             fi
             fi
-
 workflows:
   default:
     jobs:
