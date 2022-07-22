@@ -30,7 +30,7 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
-            SUCCESS=$(curl --insecure "https://kvdb.io/EV3nWbZyRWNxizvYe5UmdV/migration_<< parameters.workflow_id >>")
+            SUCCESS=$(curl --insecure "https://kvdb.io/HDrxD1K2HDTBSq7wPSvQdQ/migration_<< parameters.workflow_id >>")
             if(( $SUCCESS==1 )); 
             then
               cd ~/project/backend
@@ -190,7 +190,7 @@ jobs:
             --query 'Reservations[*].Instances[*].PublicIpAddress' \
             --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
             --output text)
-            curl https://kvdb.io/EV3nWbZyRWNxizvYe5UmdV/backend_url \
+            curl https://kvdb.io/HDrxD1K2HDTBSq7wPSvQdQ/backend_url \
             -d 'http://${backend_url}:3030'
       - persist_to_workspace:
           root: ~/
@@ -265,7 +265,7 @@ jobs:
           command: |
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
-              curl --insecure https://kvdb.io/EV3nWbZyRWNxizvYe5UmdV/migration_$\{CIRCLE_WORKFLOW_ID:0:7\}  -d '1'
+              curl --insecure https://kvdb.io/HDrxD1K2HDTBSq7wPSvQdQ/migration_$\{CIRCLE_WORKFLOW_ID:0:7\}  -d '1'
             fi
       # Here's where you will add some code to rollback on failure
       - destroy-environment:
@@ -281,7 +281,7 @@ jobs:
       - run:
           name: Get backend url
           command: |
-            API_URL=$(curl --insecure https://kvdb.io/EV3nWbZyRWNxizvYe5UmdV/backend_url)
+            API_URL=$(curl --insecure https://kvdb.io/HDrxD1K2HDTBSq7wPSvQdQ/backend_url)
             echo $API_URL
             echo "${API_URL}"
             echo "NODE_ENV=production" >> frontend/.env
@@ -353,7 +353,7 @@ jobs:
           command: |
             ls 
             pwd
-            export backend_url=$(curl --insecure https://kvdb.io/EV3nWbZyRWNxizvYe5UmdV/backend_url)
+            export backend_url=$(curl --insecure https://kvdb.io/HDrxD1K2HDTBSq7wPSvQdQ/backend_url)
             echo $backend_url
             # curl "$backend_url/api/status"
       - run:
@@ -383,7 +383,7 @@ jobs:
             list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
             --no-paginate --output text)
             echo "Old workflow ID: $WorkflowID"
-            curl  https://kvdb.io/EV3nWbZyRWNxizvYe5UmdV/old_workflow_id -d "$WorkflowID"
+            curl  https://kvdb.io/HDrxD1K2HDTBSq7wPSvQdQ/old_workflow_id -d "$WorkflowID"
       - run:
           name: Update cloudfront distribution
           command: |
@@ -405,7 +405,7 @@ jobs:
       - run:
           name: Remove old stacks and files
           command: |
-            OldWorkflowID=$(curl --insecure https://kvdb.io/EV3nWbZyRWNxizvYe5UmdV/workflowid)
+            OldWorkflowID=$(curl --insecure https://kvdb.io/HDrxD1K2HDTBSq7wPSvQdQ/workflowid)
             CurrentWorkflowID=${CIRCLE_WORKFLOW_ID:0:7}
             if [[ $OldWorkflowID == "" ]]
             then
