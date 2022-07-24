@@ -265,7 +265,6 @@ jobs:
             then
               curl --insecure https://kvdb.io/HDrxD1K2HDTBSq7wPSvQdQ/migration_$\{CIRCLE_WORKFLOW_ID:0:7\}  -d '1'
             fi
-
       - slack/notify:
           channel: C03DAJYL3SM #slack channel
           event: fail
