@@ -425,7 +425,7 @@ jobs:
             if curl ${URL} | grep "Welcome"
             then
               # Change this to 0 after the job fails
-              return 0
+              return 1
             else
               return 1
             fi
@@ -518,8 +518,8 @@ workflows:
           requires: [build-frontend]
       - scan-backend:
           requires: [build-backend]
-      - deploy:
-          context: slack-secrets
+      # - deploy:
+      #     context: slack-secrets
       - deploy-infrastructure:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
           filters:
@@ -538,4 +538,4 @@ workflows:
       - cloudfront-update:
           requires: [smoke-test]
       - cleanup:
-          requires: [cloudfront-update]   
+          requires: [cloudfront-update]
