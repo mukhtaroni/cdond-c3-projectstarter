@@ -44,7 +44,7 @@ jobs:
     steps:
       - checkout
       - slack/notify:
-          channel: C03DAJYL3SM #channel
+          channel: C03DAJYL3SM 
           event: fail
           template: basic_fail_1
 
@@ -198,7 +198,7 @@ jobs:
           event: fail
       - destroy_environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
-        # when: on_fail
+        when: on_fail
 
   configure-infrastructure:
     docker:
@@ -236,12 +236,12 @@ jobs:
             cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
       - slack/notify:
-          channel: C03DAJYL3SM #slack channel
+          channel: C03DAJYL3SM 
           event: fail
 
       - destroy_environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
-        # when: on_fail
+        when: on_fail
 
   run-migrations:
     docker:
@@ -265,7 +265,7 @@ jobs:
               curl --insecure https://kvdb.io/HDrxD1K2HDTBSq7wPSvQdQ/migration_$\{CIRCLE_WORKFLOW_ID:0:7\}  -d '1'
             fi
       - slack/notify:
-          channel: C03DAJYL3SM #slack channel
+          channel: C03DAJYL3SM 
           event: fail
           # Here's where you will add some code to rollback on failure
       - destroy_environment:
@@ -317,7 +317,7 @@ jobs:
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
 
       - slack/notify:
-          channel: C03DAJYL3SM #slack channel
+          channel: C03DAJYL3SM 
           event: fail
 
       - destroy_environment:
@@ -374,7 +374,7 @@ jobs:
             ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml
 
       - slack/notify:
-          channel: C03DAJYL3SM #slack channel
+          channel: C03DAJYL3SM 
           event: fail
       # rollback on failure
       - destroy_environment:
@@ -515,8 +515,8 @@ workflows:
           requires: [build-frontend]
       - scan-backend:
           requires: [build-backend]
-      # - deploy:
-      #     context: slack-secrets
+      - deploy:
+          context: slack-secrets
       - deploy-infrastructure:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
           filters:
